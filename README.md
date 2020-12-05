@@ -1,6 +1,5 @@
 # 2HOL
-Documentation and Ansible Playbooks for Two Hours One Life
+Documentation and Ansible Playbooks for Two Hours One Life.
+Use this as a quick reference or a guide to duplicate this project.
 
-This repository will be used to document the future infrastructure of 2HOL as I slowly chip away at intoducing CI/CD.
-
-The goal here is to minimise the bus factor and allow for anyone (with the skills) to come in and pickup maintaining the project wherever it is left.
+This repository will mostly reference future plans of 2HOL as I slowly chip away at introducing CI/CD.
