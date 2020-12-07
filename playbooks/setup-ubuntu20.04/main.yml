@@ -1,0 +1,87 @@
+---
+- name: Setup Ubuntu 20.04
+  hosts: all
+  vars_files:
+    - vars/default.yml
+
+  handlers:
+    - name: restart ssh
+      service:
+        name: ssh
+        state: restarted
+
+  tasks:
+    - name: update apt
+      apt:
+        update_cache: true
+
+    - name: required system packages are installed
+      apt:
+        name: "{{ system_packages }}"
+
+    - name: 'wheel' group exists
+      group:
+        name: wheel
+        state: present
+
+    - name: 'wheel' group has passwordless sudo
+      lineinfile:
+        path: /etc/sudoers
+        state: present
+        regexp: "^%wheel"
+        line: "%wheel ALL=(ALL) NOPASSWD: ALL"
+        validate: "/usr/sbin/visudo -cf %s"
+
+    - name: admin user exists
+      user:
+        name: "{{ admin_user }}"
+        state: present
+        groups: wheel
+        append: true
+        create_home: true
+        shell: /bin/bash
+
+    - name: authorised key is set for remote user
+        authorized_key:
+          user: "{{ admin_user }}"
+          state: present
+          key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+
+    - name: ssh configuration has increased security
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        state: present
+        validate: 'sshd -t -f %s'
+      with_items:
+        - regexp: "^PasswordAuthentication"
+          line: "PasswordAuthentication no"
+        - regexp: "^PermitRootLogin"
+          line: "PermitRootLogin no"
+        - regexp: "^Port"
+          line: "Port {{ ssh_port }}"
+      notify: restart ssh
+
+    - name: ufw limits ssh connections
+      ufw:
+        rule: limit
+        port: "{{ ssh_port }}"
+
+    - name: ufw is enabled, deny other incoming traffic
+      ufw:
+        state: enabled
+        policy: deny
+        direction: incoming
+        logging: on
+
+    - name: unattended-upgrades configuration files in place
+      template:
+        src: "../templates/{{ item }}.j2"
+        dest: "/etc/apt/apt.conf.d/{{ item }}"
+        owner: root
+        group: root
+        mode: 0644
+      with_items:
+        - 20auto-upgrades
+        - 50unattended-upgrades
