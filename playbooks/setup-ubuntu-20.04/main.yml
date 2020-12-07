@@ -1,5 +1,5 @@
 ---
-- name: Setup Ubuntu 20.04
+- name: setup ubuntu 20.04
   hosts: all
   vars_files:
     - vars/default.yml
