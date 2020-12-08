@@ -12,9 +12,7 @@
     cache_valid_time: "3600"
     autoremove: true
     autoclean: true
-
-- name: Reboot machine
-  reboot:
+  notify: Reboot machine
 
 - name: Generate SSH keys
   shell: ssh-keygen -f ~/.ssh/id_rsa -N ""

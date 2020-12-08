@@ -3,3 +3,6 @@
   service:
     name: ssh
     state: restarted
+
+- name: Reboot machine
+  reboot:
