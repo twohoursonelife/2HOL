@@ -1,24 +1,11 @@
 ---
-- name: setup ubuntu 20.04
+- name: setup ubuntu 20.04 (root user)
   hosts: all
+  remote_user: root
   vars_files:
     - vars/default.yml
 
-  handlers:
-    - name: restart ssh
-      service:
-        name: ssh
-        state: restarted
-
   tasks:
-    - name: update apt
-      apt:
-        update_cache: true
-
-    - name: required system packages are installed
-      apt:
-        name: "{{ system_packages }}"
-
     - name: 'wheel' group exists
       group:
         name: wheel
@@ -40,6 +27,32 @@
         append: true
         create_home: true
         shell: /bin/bash
+
+- name: setup ubuntu 20.04 (sudo user)
+  hosts: all
+  remote_user: "{{ admin_user }}"
+  vars_files:
+    - vars/default.yml
+
+  handlers:
+    - name: restart ssh
+      service:
+        name: ssh
+        state: restarted
+
+  tasks:
+    - name: update apt
+      apt:
+        update_cache: true
+
+    - name: required system packages are installed
+      apt:
+        name: "{{ system_packages }}"
+
+    - name: generate ssh keys
+      shell: su thol | ssh-keygen -f ~/.ssh/id_rsa -N "" | exit
+      args:
+        creates: ~/.ssh/id_rsa
 
     - name: authorised key is set for remote user
         authorized_key:
