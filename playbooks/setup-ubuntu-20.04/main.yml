@@ -6,12 +6,12 @@
     - vars/default.yml
 
   tasks:
-    - name: 'wheel' group exists
+    - name: wheel group exists
       group:
         name: wheel
         state: present
 
-    - name: 'wheel' group has passwordless sudo
+    - name: wheel group has passwordless sudo
       lineinfile:
         path: /etc/sudoers
         state: present
