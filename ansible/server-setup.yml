@@ -6,3 +6,4 @@
     - role: initial-ubuntu-20.04-setup
       remote_user: root
     - role: complete-ubuntu-20.04-setup
+      become: yes
