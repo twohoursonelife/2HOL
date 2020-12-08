@@ -35,7 +35,7 @@
       line: "PermitRootLogin no"
     - regexp: "^Port"
       line: "Port 22"
-  notify: restart ssh
+  notify: Restart ssh
 
 - name: Limit SSH on UFW
   ufw:
