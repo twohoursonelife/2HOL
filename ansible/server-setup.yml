@@ -3,6 +3,7 @@
   ignore_unreachable: true
   become: yes
   roles:
-    - initial-ubuntu-20.04-setup
+  - role: initial-ubuntu-20.04-setup
+    remote_user: root
     - complete-ubuntu-20.04-setup
 
