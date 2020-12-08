@@ -1,4 +1,4 @@
 ---
 admin_user: thol
 system_packages: ["curl", "git", "ufw", "unattended-upgrades"]
-ssh_port: 22
+ssh_port: "22"

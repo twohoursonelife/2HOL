@@ -89,7 +89,7 @@
         state: enabled
         policy: deny
         direction: incoming
-        logging: on
+        logging: "on"
 
     - name: unattended-upgrades configuration files in place
       template:
