@@ -7,7 +7,7 @@
     - vars/default.yml
 
   tasks:
-    - import_tasks: _sshd_port_juggling.yml ansible_port={{ ssh_port }}
+    - import_tasks: _sshd_port_juggling.yml ansible_port="{{ ssh_port }}"
 
     - name: wheel group exists
       group:
