@@ -7,7 +7,7 @@
     - vars/default.yml
 
   tasks:
-    - import_tasks: _sshd_port_juggling.yml
+    - import_tasks: sshd_port_juggling/_sshd_port_juggling.yml
       vars:
         ansible_port: "{{ ssh_port }}"
 
