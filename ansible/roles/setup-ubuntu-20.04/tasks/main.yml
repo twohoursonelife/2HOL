@@ -1,6 +1,5 @@
 ---
 - name: setup ubuntu 20.04 (root user)
-  hosts: all
   remote_user: root
   ignore_unreachable: yes
   vars_files:
@@ -36,7 +35,6 @@
         key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
 
 - name: setup ubuntu 20.04 (sudo user)
-  hosts: all
   remote_user: "{{ admin_user }}"
   become: yes
   vars_files:
