@@ -2,12 +2,11 @@
 - name: setup ubuntu 20.04 (root user)
   hosts: all
   remote_user: root
-  gather_facts: false
+  ignore_unreachable: yes
   vars_files:
     - vars/default.yml
 
   tasks:
-
     - name: wheel group exists
       group:
         name: wheel
@@ -70,7 +69,7 @@
         regexp: "{{ item.regexp }}"
         line: "{{ item.line }}"
         state: present
-        validate: 'sshd -t -f %s'
+        validate: "sshd -t -f %s"
       with_items:
         - regexp: "^PasswordAuthentication"
           line: "PasswordAuthentication no"
