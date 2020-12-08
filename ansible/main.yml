@@ -1,4 +1,4 @@
 ---
 - hosts: all
   roles:
-    - setp-ubuntu-20.04
+    - setup-ubuntu-20.04
