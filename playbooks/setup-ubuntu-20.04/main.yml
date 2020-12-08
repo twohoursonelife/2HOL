@@ -2,10 +2,13 @@
 - name: setup ubuntu 20.04 (root user)
   hosts: all
   remote_user: root
+  gather_facts: false
   vars_files:
     - vars/default.yml
 
   tasks:
+    - import_tasks: _sshd_port_juggling.yml ansible_port={{ ssh_port }}
+
     - name: wheel group exists
       group:
         name: wheel
