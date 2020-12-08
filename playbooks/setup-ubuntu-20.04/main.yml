@@ -38,7 +38,7 @@
 - name: setup ubuntu 20.04 (sudo user)
   hosts: all
   remote_user: "{{ admin_user }}"
-  become: true
+  become: yes
   vars_files:
     - vars/default.yml
 
