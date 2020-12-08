@@ -1,5 +1,12 @@
 ---
-- tasks:
+- name: setup ubuntu 20.04 (root user)
+  hosts: all
+  remote_user: root
+  ignore_unreachable: yes
+  vars_files:
+    - vars/main.yml
+
+  tasks:
     - name: wheel group exists
       group:
         name: wheel
@@ -27,3 +34,75 @@
         user: "{{ admin_user }}"
         state: present
         key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+
+- name: setup ubuntu 20.04 (sudo user)
+  hosts: all
+  remote_user: "{{ admin_user }}"
+  become: yes
+  vars_files:
+    - vars/main.yml
+
+  tasks:
+    - name: update apt
+      apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: required system packages are installed
+      apt:
+        name: "{{ system_packages }}"
+
+    - name: generate ssh keys
+      shell: ssh-keygen -f ~/.ssh/id_rsa -N ""
+      args:
+        creates: ~/.ssh/id_rsa
+
+    - name: ssh configuration has increased security
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        state: present
+        validate: "sshd -t -f %s"
+      with_items:
+        - regexp: "^PasswordAuthentication"
+          line: "PasswordAuthentication no"
+        - regexp: "^PermitRootLogin"
+          line: "PermitRootLogin no"
+        - regexp: "^Port"
+          line: "Port 22"
+      notify: restart ssh
+
+    - name: ufw limits ssh connections
+      ufw:
+        rule: limit
+        name: OpenSSH
+
+    - name: ufw is enabled, deny other incoming traffic
+      ufw:
+        state: enabled
+        policy: deny
+        direction: incoming
+        logging: "on"
+
+    - name: unattended-upgrades configuration files in place
+      template:
+        src: "../templates/{{ item }}.j2"
+        dest: "/etc/apt/apt.conf.d/{{ item }}"
+        owner: root
+        group: root
+        mode: 0644
+      with_items:
+        - 20auto-upgrades
+        - 50unattended-upgrades
+
+    - name: Upgrade all packages
+      apt:
+        upgrade: "yes"
+        update_cache: true
+        cache_valid_time: "3600"
+        autoremove: true
+        autoclean: true
+
+    - name: Reboot machine
+      reboot:
