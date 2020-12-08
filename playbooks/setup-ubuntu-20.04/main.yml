@@ -51,6 +51,7 @@
     - name: update apt
       apt:
         update_cache: true
+        cache_valid_time: 3600
 
     - name: required system packages are installed
       apt:
