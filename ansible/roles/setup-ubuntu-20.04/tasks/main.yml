@@ -1,47 +1,27 @@
 ---
-- name: wheel group exists
-  group:
-    name: wheel
-    state: present
-
-- name: wheel group has passwordless sudo
-  lineinfile:
-    path: /etc/sudoers
-    state: present
-    regexp: "^%wheel"
-    line: "%wheel ALL=(ALL) NOPASSWD: ALL"
-    validate: "/usr/sbin/visudo -cf %s"
-
-- name: admin user exists
-  user:
-    name: "{{ admin_user }}"
-    state: present
-    groups: wheel
-    append: true
-    create_home: true
-    shell: /bin/bash
-
-- name: authorised key is set for remote user
-  authorized_key:
-    user: "{{ admin_user }}"
-    state: present
-    key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
-
-- name: update apt
-  apt:
-    update_cache: true
-    cache_valid_time: 3600
-
-- name: required system packages are installed
+- name: Install required system packages
   apt:
     name: "{{ system_packages }}"
+    update_cache: true
+    cache_valid_time: "3600"
 
-- name: generate ssh keys
+- name: Upgrade all packages; autoremove & autoclean
+  apt:
+    upgrade: "yes"
+    update_cache: true
+    cache_valid_time: "3600"
+    autoremove: true
+    autoclean: true
+
+- name: Reboot machine
+  reboot:
+
+- name: Generate SSH keys
   shell: ssh-keygen -f ~/.ssh/id_rsa -N ""
   args:
     creates: ~/.ssh/id_rsa
 
-- name: ssh configuration has increased security
+- name: Disable SSH PasswordAuthentication, PermitRootLogin, Port 22
   lineinfile:
     dest: /etc/ssh/sshd_config
     regexp: "{{ item.regexp }}"
@@ -57,19 +37,19 @@
       line: "Port 22"
   notify: restart ssh
 
-- name: ufw limits ssh connections
+- name: Limit SSH on UFW
   ufw:
     rule: limit
     name: OpenSSH
 
-- name: ufw is enabled, deny other incoming traffic
+- name: Enable UFW, default policy deny incoming
   ufw:
     state: enabled
     policy: deny
     direction: incoming
     logging: "on"
 
-- name: unattended-upgrades configuration files in place
+- name: Enable unattended-upgrades
   template:
     src: "../templates/{{ item }}.j2"
     dest: "/etc/apt/apt.conf.d/{{ item }}"
@@ -79,14 +59,3 @@
   with_items:
     - 20auto-upgrades
     - 50unattended-upgrades
-
-- name: Upgrade all packages
-  apt:
-    upgrade: "yes"
-    update_cache: true
-    cache_valid_time: "3600"
-    autoremove: true
-    autoclean: true
-
-- name: Reboot machine
-  reboot:

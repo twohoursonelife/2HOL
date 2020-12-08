@@ -1,0 +1,28 @@
+---
+- name: Create wheel group
+  group:
+    name: wheel
+    state: present
+
+- name: Grant wheel group NOPASSWD sudo
+  lineinfile:
+    path: /etc/sudoers
+    state: present
+    regexp: "^%wheel"
+    line: "%wheel ALL=(ALL) NOPASSWD: ALL"
+    validate: "/usr/sbin/visudo -cf %s"
+
+- name: Create admin user
+  user:
+    name: "{{ admin_user }}"
+    state: present
+    groups: wheel
+    append: true
+    create_home: true
+    shell: /bin/bash
+
+- name: Add Ansible Controller key as an authorised key for new admin user
+  authorized_key:
+    user: "{{ admin_user }}"
+    state: present
+    key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"

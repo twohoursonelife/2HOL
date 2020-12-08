@@ -1,3 +1,2 @@
 ---
-admin_user: thol
 system_packages: ["git", "ufw", "unattended-upgrades", "aptitude"]
