@@ -1,4 +1,3 @@
 ---
-- hosts: all
-  roles:
+- roles:
     - setup-ubuntu-20.04
