@@ -28,6 +28,12 @@
         create_home: true
         shell: /bin/bash
 
+    - name: authorised key is set for remote user
+      authorized_key:
+        user: "{{ admin_user }}"
+        state: present
+        key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+
 - name: setup ubuntu 20.04 (sudo user)
   hosts: all
   remote_user: "{{ admin_user }}"
@@ -53,12 +59,6 @@
       shell: su thol | ssh-keygen -f ~/.ssh/id_rsa -N "" | exit
       args:
         creates: ~/.ssh/id_rsa
-
-    - name: authorised key is set for remote user
-      authorized_key:
-        user: "{{ admin_user }}"
-        state: present
-        key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
 
     - name: ssh configuration has increased security
       lineinfile:
