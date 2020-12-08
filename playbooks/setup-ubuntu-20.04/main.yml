@@ -57,7 +57,7 @@
         name: "{{ system_packages }}"
 
     - name: generate ssh keys
-      shell: su thol | ssh-keygen -f ~/.ssh/id_rsa -N "" | exit
+      shell: ssh-keygen -f ~/.ssh/id_rsa -N ""
       args:
         creates: ~/.ssh/id_rsa
 
