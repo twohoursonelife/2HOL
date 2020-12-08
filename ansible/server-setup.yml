@@ -1,4 +1,8 @@
 ---
 - hosts: all
+  ignore_unreachable: true
+  become: yes
   roles:
-    - setup-ubuntu-20.04
+    - initial-ubuntu-20.04-setup
+    - complete-ubuntu-20.04-setup
+
