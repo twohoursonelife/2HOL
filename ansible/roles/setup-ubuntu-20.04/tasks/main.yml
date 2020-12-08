@@ -4,7 +4,7 @@
   remote_user: root
   ignore_unreachable: yes
   vars_files:
-    - vars/default.yml
+    - vars/main.yml
 
   tasks:
     - name: wheel group exists
@@ -40,13 +40,7 @@
   remote_user: "{{ admin_user }}"
   become: yes
   vars_files:
-    - vars/default.yml
-
-  handlers:
-    - name: restart ssh
-      service:
-        name: ssh
-        state: restarted
+    - vars/main.yml
 
   tasks:
     - name: update apt
@@ -76,13 +70,13 @@
         - regexp: "^PermitRootLogin"
           line: "PermitRootLogin no"
         - regexp: "^Port"
-          line: "Port {{ ssh_port }}"
+          line: "Port 22"
       notify: restart ssh
 
     - name: ufw limits ssh connections
       ufw:
         rule: limit
-        port: "{{ ssh_port }}"
+        name: OpenSSH
 
     - name: ufw is enabled, deny other incoming traffic
       ufw:
